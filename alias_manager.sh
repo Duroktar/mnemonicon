@@ -6,16 +6,6 @@ ALIAS_FILE="$HOME/.bash_aliases"
 # Ensure the alias file exists
 touch "$ALIAS_FILE"
 
-# Function to display aliases
-display_aliases() {
-    local aliases=$(grep '^alias ' "$ALIAS_FILE" | sed 's/^alias //')
-    if [ -z "$aliases" ]; then
-        whiptail --msgbox "No aliases found." 8 40
-    else
-        whiptail --msgbox "$aliases" 20 80 --title "Current Aliases"
-    fi
-}
-
 # Function to add an alias
 add_alias() {
     local alias_name=$(whiptail --inputbox "Enter alias name (e.g., ll)" 8 40 3>&1 1>&2 2>&3)
@@ -42,29 +32,41 @@ add_alias() {
 
 # Function to edit an alias
 edit_alias() {
-    local aliases=()
+    local aliases_raw=() # Stores pairs of "name" "command"
+    local menu_options=() # Stores "index" "name: command" for whiptail
+    local i=0
+
     while IFS= read -r line; do
         if [[ "$line" =~ ^alias[[:space:]]+([^=]+)=[\"\'](.+)[\"\']$ ]]; then
             local name="${BASH_REMATCH[1]}"
             local cmd="${BASH_REMATCH[2]}"
-            aliases+=("$name" "$cmd")
+            aliases_raw+=("$name" "$cmd")
+            menu_options+=("$i" "$name: $cmd")
+            i=$((i + 1))
         fi
     done < "$ALIAS_FILE"
 
-    if [ ${#aliases[@]} -eq 0 ]; then
+    if [ ${#aliases_raw[@]} -eq 0 ]; then
         whiptail --msgbox "No aliases to edit." 8 40
         return
     fi
 
-    local selected_alias_index=$(whiptail --menu "Choose an alias to edit:" 20 78 12 "${aliases[@]}" 3>&1 1>&2 2>&3)
-    local exit_status=$?
-    if [ $exit_status -ne 0 ]; then return; fi # User cancelled
+    # Corrected way to capture output and check status directly for cancellation
+    local selected_menu_index
+    if ! selected_menu_index=$(whiptail --menu "Choose an alias to edit:" 20 78 12 "${menu_options[@]}" 3>&1 1>&2 2>&3); then
+        # If whiptail exits with non-zero status (e.g., Cancel/ESC)
+        return
+    fi
 
-    local original_name="${aliases[$selected_alias_index]}"
-    local original_command="${aliases[$((selected_alias_index + 1))]}"
+    # Calculate the actual index in aliases_raw
+    local original_name_index=$((selected_menu_index * 2))
+    local original_command_index=$((selected_menu_index * 2 + 1))
+
+    local original_name="${aliases_raw[$original_name_index]}"
+    local original_command="${aliases_raw[$original_command_index]}"
 
     local new_command=$(whiptail --inputbox "Edit command for '$original_name':" 8 60 "$original_command" 3>&1 1>&2 2>&3)
-    exit_status=$?
+    local exit_status=$? # Keep this check as it's separate input
     if [ $exit_status -ne 0 ]; then return; fi # User cancelled
 
     if [ -z "$new_command" ]; then
@@ -73,18 +75,17 @@ edit_alias() {
     fi
 
     # Use awk to replace the line
-    awk -v old_name="$original_name" -v new_cmd="$new_command" '
+    awk -v old_name_regex="^alias[[:space:]]+${original_name}==" -v old_name="$original_name" -v new_cmd="$new_command" '
         BEGIN { found = 0 }
-        $0 ~ ("^alias " old_name "=.+") {
+        $0 ~ old_name_regex {
             print "alias " old_name "=\x27" new_cmd "\x27"
             found = 1
         }
-        !($0 ~ ("^alias " old_name "=.+")) {
+        !($0 ~ old_name_regex) {
             print $0
         }
         END {
             if (!found) {
-                # This case should ideally not happen if selection is from existing aliases
                 print "alias " old_name "=\x27" new_cmd "\x27"
             }
         }
@@ -95,30 +96,39 @@ edit_alias() {
 
 # Function to delete an alias
 delete_alias() {
-    local aliases=()
+    local aliases_raw=() # Stores pairs of "name" "command"
+    local menu_options=() # Stores "index" "name: command" for whiptail
+    local i=0
+
     while IFS= read -r line; do
         if [[ "$line" =~ ^alias[[:space:]]+([^=]+)=[\"\'](.+)[\"\']$ ]]; then
             local name="${BASH_REMATCH[1]}"
             local cmd="${BASH_REMATCH[2]}"
-            aliases+=("$name" "$cmd")
+            aliases_raw+=("$name" "$cmd")
+            menu_options+=("$i" "$name: $cmd")
+            i=$((i + 1))
         fi
     done < "$ALIAS_FILE"
 
-    if [ ${#aliases[@]} -eq 0 ]; then
+    if [ ${#aliases_raw[@]} -eq 0 ]; then
         whiptail --msgbox "No aliases to delete." 8 40
         return
     fi
 
-    local selected_alias_index=$(whiptail --menu "Choose an alias to delete:" 20 78 12 "${aliases[@]}" 3>&1 1>&2 2>&3)
-    local exit_status=$?
-    if [ $exit_status -ne 0 ]; then return; fi # User cancelled
+    # Corrected way to capture output and check status directly for cancellation
+    local selected_menu_index
+    if ! selected_menu_index=$(whiptail --menu "Choose an alias to delete:" 20 78 12 "${menu_options[@]}" 3>&1 1>&2 2>&3); then
+        # If whiptail exits with non-zero status (e.g., Cancel/ESC)
+        return
+    fi
 
-    local alias_to_delete="${aliases[$selected_alias_index]}"
+    # Calculate the actual index of the name in aliases_raw
+    local alias_name_to_delete="${aliases_raw[$((selected_menu_index * 2))]}"
 
-    if (whiptail --yesno "Are you sure you want to delete alias '$alias_to_delete'?" 8 50); then
-        # Use sed to delete the line containing the alias
-        sed -i "/^alias[[:space:]]\+$alias_to_delete=/d" "$ALIAS_FILE"
-        whiptail --msgbox "Alias '$alias_to_delete' deleted successfully. Remember to 'source ~/.bashrc' or open a new terminal for changes to take effect." 10 70
+    if (whiptail --yesno "Are you sure you want to delete alias '$alias_name_to_delete'?" 8 50); then
+        # Use sed to delete the line containing the alias. Escaping special characters in alias_name_to_delete for sed.
+        sed -i "/^alias[[:space:]]\+${alias_name_to_delete}=/d" "$ALIAS_FILE"
+        whiptail --msgbox "Alias '$alias_name_to_delete' deleted successfully. Remember to 'source ~/.bashrc' or open a new terminal for changes to take effect." 10 70
     else
         whiptail --msgbox "Deletion cancelled." 8 40
     fi
@@ -127,18 +137,16 @@ delete_alias() {
 # Main menu
 while true; do
     CHOICE=$(whiptail --menu "Alias Manager (File: $ALIAS_FILE)" 20 78 12 \
-        "1" "View Aliases" \
-        "2" "Add Alias" \
-        "3" "Edit Alias" \
-        "4" "Delete Alias" \
-        "5" "Exit" 3>&1 1>&2 2>&3)
+        "1" "Add Alias" \
+        "2" "Edit Alias" \
+        "3" "Delete Alias" \
+        "4" "Exit" 3>&1 1>&2 2>&3)
 
     case $CHOICE in
-        1) display_aliases ;;
-        2) add_alias ;;
-        3) edit_alias ;;
-        4) delete_alias ;;
-        5) break ;;
+        1) add_alias ;;
+        2) edit_alias ;;
+        3) delete_alias ;;
+        4) break ;;
         *) break ;; # Handle ESC or other unexpected input
     esac
 done
