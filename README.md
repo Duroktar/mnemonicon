@@ -36,10 +36,9 @@ To install `mnemonicon`, follow these steps:
 
 1.  **Clone the Repository (or download the files):**
     ```bash
-    git clone [https://github.com/your-username/mnemonicon.git](https://github.com/your-username/mnemonicon.git)
+    git clone https://github.com/Duroktar/mnemonicon.git
     cd mnemonicon
     ```
-    *(Replace `your-username` with your actual GitHub username and adjust the repository name if different.)*
 
 2.  **Run the Installer Script:**
     The `install.sh` script will make `alias-manager.sh` executable and create a symbolic link named `mnemonicon` in `~/.local/bin`, making it accessible from anywhere in your terminal.
