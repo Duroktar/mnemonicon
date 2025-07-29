@@ -42,9 +42,9 @@ To install `mnemonicon`, follow these steps:
     *(Replace `your-username` with your actual GitHub username and adjust the repository name if different.)*
 
 2.  **Run the Installer Script:**
-    The `install_mnemonicon.sh` script will make `alias-manager.sh` executable and create a symbolic link named `mnemonicon` in `~/.local/bin`, making it accessible from anywhere in your terminal.
+    The `install.sh` script will make `alias-manager.sh` executable and create a symbolic link named `mnemonicon` in `~/.local/bin`, making it accessible from anywhere in your terminal.
     ```bash
-    ./install_mnemonicon.sh
+    ./install.sh
     ```
 
     The installer will guide you and inform you if `~/.local/bin` needs to be added to your system's `PATH` environment variable. If it does, you'll typically add the following line to your `~/.bashrc` (or `~/.zshrc`):
