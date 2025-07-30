@@ -6,6 +6,30 @@ ALIAS_FILE="$HOME/.bash_aliases"
 # Ensure the alias file exists
 touch "$ALIAS_FILE"
 
+# Function to display aliases
+display_aliases() {
+    # Use sed to parse alias name and command, sort alphabetically, then pipe to column -t for clean alignment
+    local aliases_content=$(
+        grep '^alias ' "$ALIAS_FILE" | \
+        sed -E "s/^alias[[:space:]]+([^=]+)='(.*)'/\1\t\2/" | \
+        sort -f | \
+        column -t -s $'\t'
+    )
+
+    if [ -z "$aliases_content" ]; then
+        whiptail --msgbox "No aliases found." 8 40
+    else
+        # Use --textbox for scrollable content.
+        # Temp file to hold content for textbox
+        local temp_alias_list=$(mktemp)
+        echo "$aliases_content" > "$temp_alias_list"
+
+        # --textbox inherently provides scrolling; --scrolltext is redundant here.
+        whiptail --textbox "$temp_alias_list" 20 80 --title "Current Aliases" --scrolltext
+        rm "$temp_alias_list" # Clean up temp file
+    fi
+}
+
 # Function to add an alias
 add_alias() {
     local alias_name=$(whiptail --inputbox "Enter alias name (e.g., ll)" 8 40 3>&1 1>&2 2>&3)
@@ -137,16 +161,18 @@ delete_alias() {
 # Main menu
 while true; do
     CHOICE=$(whiptail --menu "Alias Manager (File: $ALIAS_FILE)" 20 78 12 \
-        "1" "Add Alias" \
-        "2" "Edit Alias" \
-        "3" "Delete Alias" \
-        "4" "Exit" 3>&1 1>&2 2>&3)
+        "View Aliases" "" \
+        "Add Alias" "" \
+        "Edit Alias" "" \
+        "Delete Alias" "" \
+        "Exit" "" 3>&1 1>&2 2>&3)
 
     case $CHOICE in
-        1) add_alias ;;
-        2) edit_alias ;;
-        3) delete_alias ;;
-        4) break ;;
+        "View Aliases") display_aliases ;;
+        "Add Alias") add_alias ;;
+        "Edit Alias") edit_alias ;;
+        "Delete Alias") delete_alias ;;
+        "Exit") break ;;
         *) break ;; # Handle ESC or other unexpected input
     esac
 done

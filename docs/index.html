@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mnemonicon - The Tome of Aliases</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom font for a more 'tome' like feel */
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Old+Standard+TT:ital,wght@0,400;0,700;1,400&display=swap');
+        body {
+            font-family: 'Old Standard TT', serif; /* Primary text font */
+        }
+        .font-cinzel {
+            font-family: 'Cinzel', serif; /* For headings */
+        }
+    </style>
+</head>
+<body class="bg-[#2A0F05] text-[#F0D9B5] min-h-screen flex flex-col items-center py-8">
+    <div class="container max-w-3xl mx-auto p-6 bg-[#3A1C0F] rounded-xl shadow-lg border-2 border-[#5C3B24]">
+
+        <!-- Header Section -->
+        <header class="text-center mb-10">
+            <h1 class="font-cinzel text-5xl md:text-6xl font-bold text-[#F0E6D2] mb-4 drop-shadow-md">
+                MNEMONICON
+            </h1>
+            <p class="text-xl italic text-[#D4C09F]">The Ancient Tome of Command-Line Secrets</p>
+        </header>
+
+        <!-- Logo Image -->
+        <div class="flex justify-center mb-10">
+            <img src="./logo.png"
+                 alt="Mnemonicon Logo - Stylized Book with Terminal Prompt"
+                 class="w-48 h-48 rounded-lg border-2 border-[#66FF66] shadow-lg
+                        transition-transform duration-300 hover:scale-105"
+                 onerror="this.onerror=null;this.src='https://placehold.co/200x200/3D4A45/66FF66?text=MNEMONICON+LOGO+Fallback';">
+            <!--
+                IMPORTANT: Replace the 'src' attribute above with the actual path to your logo-2.jpg file.
+                Example: src="./assets/logo-2.jpg" or src="/images/logo-2.jpg"
+                Ensure the image is placed in your GitHub Pages repository.
+            -->
+        </div>
+
+        <!-- Introduction Section -->
+        <section class="mb-10 text-lg leading-relaxed">
+            <h2 class="font-cinzel text-3xl font-bold text-[#F0E6D2] mb-4 border-b-2 border-[#5C3B24] pb-2">
+                What is Mnemonicon?
+            </h2>
+            <p class="mb-4">
+                Mnemonicon is a powerful, yet elegantly simple, Text User Interface (TUI) tool designed to manage your Linux shell aliases.
+                Inspired by ancient tomes of knowledge, it provides an intuitive `whiptail`-based interface to master your command-line shortcuts.
+            </p>
+            <p>
+                Forget memorizing complex commands; let Mnemonicon be your guide to a more efficient and personalized terminal experience.
+            </p>
+        </section>
+
+        <!-- Features Section -->
+        <section class="mb-10 text-lg leading-relaxed">
+            <h2 class="font-cinzel text-3xl font-bold text-[#F0E6D2] mb-4 border-b-2 border-[#5C3B24] pb-2">
+                Features
+            </h2>
+            <ul class="list-disc list-inside space-y-2 pl-4">
+                <li><strong class="text-[#66FF66]">View Aliases:</strong> Browse your entire collection of aliases in a clear, scrollable, and alphabetically sorted display.</li>
+                <li><strong class="text-[#66FF66]">Add Aliases:</strong> Easily forge new command shortcuts with interactive prompts.</li>
+                <li><strong class="text-[#66FF66]">Edit Aliases:</strong> Modify the incantations (commands) bound to your existing aliases.</li>
+                <li><strong class="text-[#66FF66]">Delete Aliases:</strong> Banish old or unused aliases with a simple confirmation.</li>
+                <li><strong class="text-[#66FF66]">Persistent Lore:</strong> All changes are meticulously recorded in your `~/.bash_aliases` file.</li>
+            </ul>
+        </section>
+
+        <!-- Installation Section -->
+        <section class="mb-10 text-lg leading-relaxed">
+            <h2 class="font-cinzel text-3xl font-bold text-[#F0E6D2] mb-4 border-b-2 border-[#5C3B24] pb-2">
+                Installation
+            </h2>
+            <p class="mb-4">
+                To bind Mnemonicon to your system, follow these ancient rites:
+            </p>
+            <div class="bg-[#251208] p-4 rounded-md overflow-x-auto mb-4 border border-[#4B2C1B]">
+                <pre class="text-[#F0D9B5] text-sm md:text-base"><code>
+# 1. Clone the sacred repository
+git clone https://github.com/Duroktar/mnemonicon.git
+cd mnemonicon
+
+# 2. Invoke the installer script
+./install_mnemonicon.sh
+
+# If ~/.local/bin was added to your PATH, remember to source your shell config:
+source ~/.bashrc # or ~/.zshrc
+                </code></pre>
+            </div>
+            <p class="text-sm italic text-[#D4C09F]">
+                *Ensure `whiptail`, `grep`, `sed`, `awk`, and `bash` are present on your system.*
+            </p>
+        </section>
+
+        <!-- Usage Section -->
+        <section class="mb-10 text-lg leading-relaxed">
+            <h2 class="font-cinzel text-3xl font-bold text-[#F0E6D2] mb-4 border-b-2 border-[#5C3B24] pb-2">
+                Usage
+            </h2>
+            <p class="mb-4">
+                Once installed, simply utter the sacred name in your terminal:
+            </p>
+            <div class="bg-[#251208] p-4 rounded-md overflow-x-auto border border-[#4B2C1B]">
+                <pre class="text-[#66FF66] text-sm md:text-base"><code>
+mnemonicon
+                </code></pre>
+            </div>
+            <p class="mt-4">
+                A mystical interface shall appear, guiding you through the management of your aliases.
+            </p>
+        </section>
+
+        <!-- Footer Section -->
+        <footer class="text-center text-sm text-[#D4C09F] mt-10 border-t-2 border-[#5C3B24] pt-4">
+            <!-- Support Blurb -->
+            <div class="support-blurb mb-4">
+                <div class="text-base mb-2">If you find 'Mnemonicon' helpful, consider supporting its development! Your contributions help keep the project healthy and growing.</div>
+                <div class="text-base mb-2">You can support me through Ko-fi: <a href="https://ko-fi.com/duroktar" target="_blank" class="text-[#66FF66] hover:underline">https://ko-fi.com/duroktar</a></div>
+            </div>
+
+            <!-- Combined Copyright and Lore Lines -->
+            <p class="mb-1">
+                <span class="copyright-line">&copy; Scott Doucet (@Duroktar) 2025. All rights reserved.</span>
+                <span class="block">&copy; 2025 Mnemonicon. Forged with Bash and Ancient Wisdom.</span>
+            </p>
+            <p class="mt-2">Read the full lore on <a href="https://github.com/Duroktar/mnemonicon" target="_blank" class="text-[#66FF66] hover:underline">GitHub</a>.</p>
+        </footer>
+
+    </div>
+</body>
+</html>
+
